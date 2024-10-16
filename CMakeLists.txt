@@ -2,13 +2,13 @@
 cmake_minimum_required(VERSION 3.14)
 
 # set variable PROJECT_NAME as cmake_project_example and C++ version
-set(PROJECT_NAME openGL_example)
+set(PROJECT_NAME shaderPixel)
 set(CMAKE_CXX_STANDARD 17)
 
 # glfw로 띄울 윈도우의 정보 세팅
 set(WINDOW_NAME "openGL Example")
-set(WINDOW_WIDTH 960)
-set(WINDOW_HEIGHT 540)
+set(WINDOW_WIDTH 640)
+set(WINDOW_HEIGHT 480)
 
 # project define. project() can set the project name, language version.
 project(${PROJECT_NAME})
@@ -20,14 +20,6 @@ add_executable(${PROJECT_NAME}
 	src/shader.cpp src/shader.h
 	src/program.cpp src/program.h
 	src/context.cpp src/context.h
-	src/buffer.cpp src/buffer.h
-	src/vertex_layout.cpp src/vertex_layout.h
-	src/image.cpp src/image.h
-	src/texture.cpp src/texture.h
-	src/mesh.cpp src/mesh.h
-	src/model.cpp src/model.h
-	src/framebuffer.cpp src/framebuffer.h
-	src/shadow_map.cpp src/shadow_map.h
 	)
 
 
