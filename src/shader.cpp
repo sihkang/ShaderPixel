@@ -16,16 +16,6 @@ Shader::~Shader()
 	}
 }
 
-/**
- * LoadFile()
- * 파일 로딩 실패 시 false
- * 성공 시 로딩된 텍스트 포인터 및 길이 가져오기.
- * glCreateShader() 를 이용한 쉐이더 오브젝트 생성
- * glShaderSource()로 소스코드 입력
- * glCompileShader() 로 쉐이더 컴파일.
- * glGetShaderiv() 로 컴파일 상태 조회
- * 실패라면, glGetShaderInfoLog()로 에러 로그 가져오기
-*/
 bool Shader::LoadFile(const std::string &filename, GLenum shaderType)
 {
 	auto result = LoadTextFile(filename);

@@ -2,6 +2,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 
 void OnFramebufferSizeChange(GLFWwindow *window, int width, int height)
 {
@@ -19,6 +22,7 @@ void OnCursorPos(GLFWwindow* window, double x, double y)
 
 void OnMouseButton(GLFWwindow* window, int button, int action, int modifier)
 {
+	ImGui_ImplGlfw_MouseButtonCallback(window, button, action, modifier);
 	auto context = (Context*)glfwGetWindowUserPointer(window);
 	double x, y;
 	glfwGetCursorPos(window, &x, &y);
@@ -81,6 +85,13 @@ int main()
 	auto glVersion = glGetString(GL_VERSION);
 	SPDLOG_INFO("OpenGL context version: {}", reinterpret_cast<const char*>(glVersion));
 
+	auto imguiContext = ImGui::CreateContext();
+	ImGui::SetCurrentContext(imguiContext);
+	ImGui_ImplGlfw_InitForOpenGL(window, false);
+	ImGui_ImplOpenGL3_Init();
+	ImGui_ImplOpenGL3_CreateFontsTexture();
+	ImGui_ImplOpenGL3_CreateDeviceObjects();
+	
 	auto context = Context::Create();
 	if (!context)
 	{
@@ -102,12 +113,22 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
-
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+	
 		context->ProcessInput(window);
 		context->Render();
-
+	
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(window);
 	}
+	ImGui_ImplOpenGL3_DestroyFontsTexture();
+	ImGui_ImplOpenGL3_DestroyDeviceObjects();
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext(imguiContext);
+
 	context.reset();
 	glfwTerminate();
 	return 0;

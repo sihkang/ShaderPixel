@@ -1,5 +1,6 @@
 #include "context.h"
 #include <spdlog/spdlog.h>
+#include <imgui.h>
 
 ContextUPtr Context::Create()
 {
@@ -32,6 +33,7 @@ void Context::ProcessInput(GLFWwindow* window)
 		m_cameraPos -= cameraSpeed * cameraUp;
 
 	// SPDLOG_INFO("cameraPos: x({}), y({}), z({})", m_cameraPos[0], m_cameraPos[1], m_cameraPos[2]);
+	// SPDLOG_INFO("cameraAngle: {}, {}", m_cameraYaw, m_cameraPitch);
 }
 
 void Context::Reshape(int width, int height) 
@@ -50,7 +52,7 @@ void Context::MouseMove(double x, double y)
 	auto deltaPos = pos - m_prevMousePos;
 
 	const float cameraRotSpeed = 0.6f;
-	m_cameraYaw -= deltaPos.x * cameraRotSpeed;
+	m_cameraYaw += deltaPos.x * cameraRotSpeed;
 	m_cameraPitch -= deltaPos.y * cameraRotSpeed;
 
 	if (m_cameraYaw < 0.0f) m_cameraYaw += 360.0f;
@@ -60,6 +62,8 @@ void Context::MouseMove(double x, double y)
 	if (m_cameraPitch < -89.0f) m_cameraPitch = -89.0f;
 
 	m_prevMousePos = pos;
+	SPDLOG_INFO("cameraFront: x({}), y({}), z({})", m_cameraFront[0], m_cameraPos[1], m_cameraPos[2]);
+	// SPDLOG_INFO("cameraAngle: {}, {}", m_cameraYaw, m_cameraPitch);
 }
 
 void Context::MouseButton(int button, int action, double x, double y)
@@ -86,62 +90,86 @@ bool Context::Init()
 		1.0f,  1.0f, 0.0f,
 		-1.0f,  1.0f, 0.0f,
 	};
-glClearColor(0.0f, 0.1f, 0.2f, 0.0f);
 	unsigned int indices[] = { 0, 1, 2, 2, 3, 0 };
-	uint32_t vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
 
-	uint32_t vbo;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	uint32_t ebo;
-	glGenBuffers(1, &ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	
+	glClearColor(0.0f, 0.1f, 0.2f, 0.0f);
+	vao = VertexLayout::Create();
+	vbo = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(float) * 3 * 4);
+	
+	vao->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+	ebo = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32_t) * 6);
 
 	m_program = Program::Create("/Users/sihwan/Programming/shaderPixel/shader/test.vs", "/Users/sihwan/Programming/shaderPixel/shader/mandelbulb.fs");
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 
 	auto model = glm::mat4(1.0f);
 	m_cameraFront =
-		glm::rotate(glm::mat4(1.0f), glm::radians(m_cameraYaw), glm::vec3(0.0f, 1.0f, 0.0f)) *
-		glm::rotate(glm::mat4(1.0f), glm::radians(m_cameraPitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
-		glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
+		glm::rotate(glm::mat4(1.0f),
+			glm::radians(m_cameraYaw), glm::vec3(0.0f, 1.0f, 0.0f)) *
+		glm::rotate(glm::mat4(1.0f),
+			glm::radians(m_cameraPitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
+		glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+
 	auto view = glm::lookAt(m_cameraPos, m_cameraPos + m_cameraFront, m_cameraUp);
 	m_cameraOrientation = glm::mat3(view);
-	auto projection = glm::perspective<float>(glm::radians(60.0f), static_cast<float>(WINDOW_WIDTH) / WINDOW_HEIGHT, 1.0f, 40.0f);
+	auto projection = glm::perspective<float>(glm::radians(45.0f), static_cast<float>(WINDOW_WIDTH) / WINDOW_HEIGHT, 1.0f, 200.0f);
 	auto mvp = projection * view * model;
 	
 	m_program->Use();	
 
-	glUniformMatrix4fv(glGetUniformLocation(m_program->Get(), "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));	
-	glUniform3fv(glGetUniformLocation(m_program->Get(), "cameraPos"), 1, glm::value_ptr(m_cameraPos));
-	glUniformMatrix3fv(glGetUniformLocation(m_program->Get(), "cameraOrientation"), 1, GL_FALSE, glm::value_ptr(m_cameraOrientation));
+	m_program->SetUniform("mvp", mvp);
+	m_program->SetUniform("cameraPos", m_cameraPos);
+	m_program->SetUniform("lightPos", m_lightPos);
+	m_program->SetUniform("cameraTarget", m_cameraFront);
+	m_program->SetUniform("iResolution", glm::vec2(m_width, m_height));
+	
 	return true;
 }
 void Context::Render()
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	static float time = 0.0f;
+	if (ImGui::Begin("Camera Setting")) {
+    	ImGui::SliderFloat("Camera Yaw", &m_cameraYaw, 0.0f, 360.0f); // 슬라이더 추가
+    	ImGui::SliderFloat("Camera Pitch", &m_cameraPitch, -89.0f, 89.0f); // 슬라이더 추가
+
+		// 카메라 Position 입력
+		ImGui::InputFloat3("Camera Position", &m_cameraPos[0], "%.2f"); // 포맷을 통해 소수점 이하 두 자리까지 표현
+		// 카메라 Front 벡터 입력
+		ImGui::InputFloat3("Camera Front", &m_cameraFront[0], "%.2f");
+		// 카메라 Up 벡터 입력
+		ImGui::InputFloat3("Camera Up", &m_cameraUp[0], "%.2f");
+
+		// float lightPos[3] = {m_lightPos[0], m_lightPos[1], m_lightPos[2]};
+		ImGui::SliderFloat("lightPos1", &m_lightPos[0], -100.0f, 100.f);
+		ImGui::SliderFloat("lightPos2", &m_lightPos[1], -100.0f, 100.f);
+		ImGui::SliderFloat("lightPos3", &m_lightPos[2], -100.0f, 100.f);
+	}
+	
+	ImGui::End();
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	auto model = glm::mat4(1.0f);
 	m_cameraFront =
-		glm::rotate(glm::mat4(1.0f), glm::radians(m_cameraYaw), glm::vec3(0.0f, 1.0f, 0.0f)) *
-		glm::rotate(glm::mat4(1.0f), glm::radians(m_cameraPitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
-		glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
+		glm::rotate(glm::mat4(1.0f),
+			glm::radians(m_cameraYaw), glm::vec3(0.0f, 1.0f, 0.0f)) *
+		glm::rotate(glm::mat4(1.0f),
+			glm::radians(m_cameraPitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
+		glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+
 	auto view = glm::lookAt(m_cameraPos, m_cameraPos + m_cameraFront, m_cameraUp);
 	m_cameraOrientation = glm::mat3(view);
-	auto projection = glm::perspective<float>(glm::radians(45.0f), (float)m_width / (float)m_height, 1.0f, 40.0f);
+	auto projection = glm::perspective<float>(glm::radians(45.0f), (float)m_width / (float)m_height, 1.0f, 100.0f);
 	auto mvp = projection * view * model;
 	
-	glUniformMatrix4fv(glGetUniformLocation(m_program->Get(), "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-	glUniform3fv(glGetUniformLocation(m_program->Get(), "cameraPos"), 1, glm::value_ptr(m_cameraPos));
-	glUniformMatrix3fv(glGetUniformLocation(m_program->Get(), "cameraOrientation"), 1, GL_FALSE, glm::value_ptr(m_cameraOrientation));
-	
-	
+	m_program->SetUniform("mvp", mvp);
+	m_program->SetUniform("cameraPos", m_cameraPos);
+	m_program->SetUniform("lightPos", m_lightPos);
+	m_program->SetUniform("cameraTarget", m_cameraFront);
+	// m_program->SetUniform("iResolution", glm::vec2(m_width, m_height));
+	m_program->SetUniform("iTime", time);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	time += 0.016;
 }

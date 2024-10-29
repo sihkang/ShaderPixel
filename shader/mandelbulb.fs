@@ -1,68 +1,96 @@
-#version 330 core
+#version 410 core
+
 out vec4 FragColor;
 
-uniform vec3 cameraPos;
-uniform mat3 cameraOrientation;
+uniform vec3 cameraPos;    // 카메라 위치
+uniform vec3 lightPos;
+// uniform vec3 cameraFront; // 카메라의 바라보는 방향
+uniform vec2 iResolution;  // 화면 해상도
+uniform float iTime;       // 시간
 
-float mandelbulbDistance(vec3 pos) {
-    // 맨델불브 거리 함수
-    vec3 z = pos;
-    float dr = 1.0;
-    float r = 0.0;
-    const int ITERATIONS = 8;
-    const float BAILOUT = 2.0;
-    const float POWER = 8.0;
+vec3 rotate(vec3 pos, float x, float y, float z) {
+    mat3 rotX = mat3(1.0, 0.0, 0.0, 0.0, cos(x), -sin(x), 0.0, sin(x), cos(x));
+    mat3 rotY = mat3(cos(y), 0.0, sin(y), 0.0, 1.0, 0.0, -sin(y), 0.0, cos(y));
+    mat3 rotZ = mat3(cos(z), -sin(z), 0.0, sin(z), cos(z), 0.0, 0.0, 0.0, 1.0);
 
-    for (int i = 0; i < ITERATIONS; i++) {
-        r = length(z);
-        if (r > BAILOUT) break;
-
-        // 맨델불브 공식
-        float theta = acos(z.z / r);
-        float phi = atan(z.y, z.x);
-        float zr = pow(r, POWER - 1.0);
-
-        dr = zr * dr * POWER + 1.0;
-
-        float newR = zr * r;
-        theta *= POWER;
-        phi *= POWER;
-
-        z = vec3(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta)) * newR;
-        z += pos;
-    }
-
-    return 0.5 * log(r) * r / dr;
+    return rotX * rotY * rotZ * pos;
 }
 
-// 레이마칭 함수
-float rayMarch(vec3 ro, vec3 rd) {
-    float t = 0.0;
-    const int MAX_STEPS = 100;
-    const float MAX_DISTANCE = 50.0;
-    const float SURFACE_DIST = 0.001;
+float hit(vec3 r) {
+    r = rotate(r, iTime, iTime, 0.0);
+    vec3 zn = r;
+    float rad = 0.0;
+    float hit = 0.0;
+    float p = 8.0 + 2.0 * sin(iTime + zn.z); // Phase-shift by zn.x
+    float d = 1.0;
+    
+    for (int i = 0; i < 10; i++) {
+        rad = length(zn);
 
-    for (int i = 0; i < MAX_STEPS; i++) {
-        vec3 p = ro + rd * t;
-        float dist = mandelbulbDistance(p);
-        if (dist < SURFACE_DIST) return t; // 표면에 닿음
-        t += dist;
-        if (t > MAX_DISTANCE) break; // 너무 멀리 나감
+        if (rad > 2.0) {
+            hit = 0.5 * log(rad) * rad / d;
+            break;
+        } else {
+            float th = atan(length(zn.xy), zn.z);
+            float phi = atan(zn.y, zn.x);
+            float rado = pow(rad, 8.0);
+            d = pow(rad, 7.0) * 7.0 * d + 1.0;
+
+            float sint = sin(th * p);
+            zn.x = rado * sint * cos(phi * p);
+            zn.y = rado * sint * sin(phi * p);
+            zn.z = rado * cos(th * p);
+            zn += r;
+        }
     }
 
-    return -1.0; // 맨델불브 표면에 닿지 않음
+    return hit;
 }
+
+vec3 eps = vec3(0.1, 0.0, 0.0);
 
 void main() {
-    vec2 uv = (gl_FragCoord.xy / vec2(640, 480)) * 2.0 - 1.0;
-    vec3 ro = cameraPos; // 카메라 위치
-    vec3 rd = normalize(cameraOrientation * vec3(uv, -1.0)); // 레이 방향
+    vec2 pos = -1.0 + 2.0 * gl_FragCoord.xy / iResolution;    
+    pos.x *= iResolution.x / iResolution.y;
 
-    float dist = rayMarch(ro, rd);
-    if (dist > 0.0) {
-        vec3 hitPos = ro + rd * dist;
-        FragColor = vec4(vec3(0.5 + 0.5 * hitPos), 1.0); // 기본 컬러링
-    } else {
-        FragColor = vec4(0.0, 0.0, 0.0, 1.0); // 배경색
+    vec3 ro = vec3(pos, 2.0); // 카메라 위치
+    vec3 la = vec3(0.0, 0.0, -1.0); // 카메라 목표
+    
+    vec3 cameraDir = normalize(la - ro);
+    vec3 cameraRight = normalize(cross(cameraDir, vec3(0.0, 1.0, 0.0)));
+    vec3 cameraUp = normalize(cross(cameraRight, cameraDir));
+
+    vec3 rd = normalize(cameraDir + vec3(pos, 0.0)); // 광선 방향
+    float t = 0.0;
+    float d = 200.0;
+
+    vec3 r;
+    vec3 color = vec3(0.0);
+
+    for (int i = 0; i < 100; i++) {
+        if (d > 0.001) {    
+            r = ro + rd * t;
+            d = hit(r);
+            t += d;    
+        }
     }
+
+    // normal 구하기. gradient로 방향을 구한다.
+    vec3 n = vec3(
+        hit(r + eps) - hit(r - eps),
+        hit(r + eps.yxz) - hit(r - eps.yxz),
+        hit(r + eps.zyx) - hit(r - eps.zyx)
+    );
+
+    vec3 mat = vec3(0.4, 0.4, 0.4); 
+    vec3 lightCol = vec3(0.1, 0.3, 0.6);
+    
+    vec3 ldir = normalize(lightPos - r);
+    vec3 diff = max(dot(ldir, (n)), 0.0) * lightCol * 60.0;
+    
+    vec3 R = reflect(ldir, n);
+    float spec = pow(max(dot(R, -rd), 0.0), 512.0);
+    vec3 specular = lightCol * spec;
+    color = (diff + specular) * mat;
+    FragColor = vec4(color, 1.0);
 }
