@@ -96,6 +96,8 @@ bool Context::Init(std::string &shaderNum)
 	glClearColor(0.0f, 0.1f, 0.2f, 0.0f);
 	if (shaderNum == "1")
 		mandelBulb_setting(vertices, indices);
+	if (shaderNum == "2")
+		mandelBox_setting(vertices, indices);
 	
 	return true;
 }
@@ -103,6 +105,8 @@ int Context::Render(std::string &shaderNum)
 {
 	if (shaderNum == "1")
 		mandelbulb_render();
+	else if (shaderNum == "2")
+		mandelBox_render();
 	else
 	{
 		SPDLOG_INFO("error: unavailable Shader Number.");
@@ -202,4 +206,61 @@ void Context::mandelbulb_render()
 
 	time += 0.016;
 
+}
+
+void Context::mandelBox_setting(float * vertices, unsigned int * indices)
+{
+
+	// camera parameter
+	m_cameraControl = false;
+	m_prevMousePos = glm::vec2(0.0f);
+	m_cameraPitch = 0.0f;
+	m_cameraYaw = 0.0f;
+	m_cameraPos = glm::vec3(0.0f, 0.0f,  1.0f);
+	m_cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	m_cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	// light
+	m_lightPos = glm::vec3(0.0f, 5.0f, 10.0f);
+
+	vao = VertexLayout::Create();
+	vbo = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(float) * 3 * 4);
+	
+	vao->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+	ebo = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32_t) * 6);
+
+	m_program = Program::Create("/Users/sihwan/Programming/shaderPixel/shader/basic.vs", "/Users/sihwan/Programming/shaderPixel/shader/mandelbox.fs");
+
+	auto model = glm::mat4(1.0f);
+	m_cameraFront =
+		glm::rotate(glm::mat4(1.0f),
+			glm::radians(m_cameraYaw), glm::vec3(0.0f, 1.0f, 0.0f)) *
+		glm::rotate(glm::mat4(1.0f),
+			glm::radians(m_cameraPitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
+		glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+
+	auto view = glm::lookAt(m_cameraPos, m_cameraPos + m_cameraFront, m_cameraUp);
+	m_cameraOrientation = glm::mat3(view);
+	auto projection = glm::perspective<float>(glm::radians(45.0f), static_cast<float>(WINDOW_WIDTH) / WINDOW_HEIGHT, 1.0f, 200.0f);
+	auto mvp = projection * view * model;
+	
+	m_program->Use();	
+
+	m_program->SetUniform("lightPos", m_lightPos);
+	m_program->SetUniform("iResolution", glm::vec2(m_width, m_height));
+}
+
+void Context::mandelBox_render()
+{
+
+	static float time = 0.0f;
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+	m_program->SetUniform("lightPos", m_lightPos);
+	m_program->SetUniform("iTime", time);
+	
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	time += 0.016;
 }

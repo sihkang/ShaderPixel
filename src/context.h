@@ -24,6 +24,10 @@ public:
 	void mandelBulb_setting(float *vertices, unsigned int *indices);
 	void mandelbulb_render();
 
+
+	void mandelBox_setting(float *, unsigned int *);
+	void mandelBox_render();
+
 private:
 	Context() {}
 	bool Init(std::string &shaderNum);
