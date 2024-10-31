@@ -2,10 +2,10 @@
 #include <spdlog/spdlog.h>
 #include <imgui.h>
 
-ContextUPtr Context::Create()
+ContextUPtr Context::Create(std::string &shaderNum)
 {
 	auto context = ContextUPtr(new Context());
-	if (!context->Init())
+	if (!context->Init(shaderNum))
 		return nullptr;
 	return std::move(context);
 }
@@ -82,7 +82,7 @@ void Context::MouseButton(int button, int action, double x, double y)
 	}
 }
 
-bool Context::Init()
+bool Context::Init(std::string &shaderNum)
 {
 	float vertices[] = {
 		-1.0f, -1.0f, 0.0f,
@@ -94,14 +94,44 @@ bool Context::Init()
 
 	
 	glClearColor(0.0f, 0.1f, 0.2f, 0.0f);
+	if (shaderNum == "1")
+		mandelBulb_setting(vertices, indices);
+	
+	return true;
+}
+int Context::Render(std::string &shaderNum)
+{
+	if (shaderNum == "1")
+		mandelbulb_render();
+	else
+	{
+		SPDLOG_INFO("error: unavailable Shader Number.");
+		return -1;
+	}
+	return 0;
+}
+
+void Context::mandelBulb_setting(float *vertices, unsigned int *indices)
+{
+	// camera parameter
+	m_cameraControl = false;
+	m_prevMousePos = glm::vec2(0.0f);
+	m_cameraPitch = 0.0f;
+	m_cameraYaw = 0.0f;
+	m_cameraPos = glm::vec3(0.0f, 0.0f,  1.0f);
+	m_cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	m_cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	// light
+	m_lightPos = glm::vec3(0.0f, 5.0f, 10.0f);
+
 	vao = VertexLayout::Create();
 	vbo = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(float) * 3 * 4);
 	
 	vao->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 	ebo = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32_t) * 6);
 
-	m_program = Program::Create("/Users/sihwan/Programming/shaderPixel/shader/test.vs", "/Users/sihwan/Programming/shaderPixel/shader/mandelbulb.fs");
-
+	m_program = Program::Create("/Users/sihwan/Programming/shaderPixel/shader/basic.vs", "/Users/sihwan/Programming/shaderPixel/shader/mandelbulb.fs");
 
 	auto model = glm::mat4(1.0f);
 	m_cameraFront =
@@ -124,9 +154,9 @@ bool Context::Init()
 	m_program->SetUniform("cameraTarget", m_cameraFront);
 	m_program->SetUniform("iResolution", glm::vec2(m_width, m_height));
 	
-	return true;
 }
-void Context::Render()
+
+void Context::mandelbulb_render()
 {
 	static float time = 0.0f;
 	if (ImGui::Begin("Camera Setting")) {
@@ -166,10 +196,10 @@ void Context::Render()
 	m_program->SetUniform("mvp", mvp);
 	m_program->SetUniform("cameraPos", m_cameraPos);
 	m_program->SetUniform("lightPos", m_lightPos);
-	m_program->SetUniform("cameraTarget", m_cameraFront);
-	// m_program->SetUniform("iResolution", glm::vec2(m_width, m_height));
+	m_program->SetUniform("cameraTarget", m_cameraFront);\
 	m_program->SetUniform("iTime", time);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	time += 0.016;
+
 }

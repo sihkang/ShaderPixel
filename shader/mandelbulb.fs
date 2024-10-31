@@ -4,7 +4,6 @@ out vec4 FragColor;
 
 uniform vec3 cameraPos;    // 카메라 위치
 uniform vec3 lightPos;
-// uniform vec3 cameraFront; // 카메라의 바라보는 방향
 uniform vec2 iResolution;  // 화면 해상도
 uniform float iTime;       // 시간
 

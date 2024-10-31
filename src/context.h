@@ -10,8 +10,8 @@
 CLASS_PTR(Context)
 class Context {
 public:
-	static ContextUPtr Create();
-	void Render();
+	static ContextUPtr Create(std::string &shaderNum);
+	int Render(std::string &shaderNum);
 	void ProcessInput(GLFWwindow* window);
 	void Reshape(int width, int height);
 	void MouseMove(double x, double y);
@@ -21,9 +21,12 @@ public:
 		const glm::mat4& projection,
 		const Program* program);
 
+	void mandelBulb_setting(float *vertices, unsigned int *indices);
+	void mandelbulb_render();
+
 private:
 	Context() {}
-	bool Init();
+	bool Init(std::string &shaderNum);
 	
 	ProgramUPtr m_program;
 

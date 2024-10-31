@@ -45,8 +45,13 @@ void OnKeyEvent(GLFWwindow *window, int key, int scancode, int action, int mods)
 	}
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+	std::string shaderNum;
+	SPDLOG_INFO("Type the shader number: ");
+	std::cin >> shaderNum;
+
+	SPDLOG_INFO("Input shader number is {}", shaderNum);
 	SPDLOG_INFO("Start program");
 	SPDLOG_INFO("Initialize glfw");
 	if (!glfwInit())
@@ -92,7 +97,7 @@ int main()
 	ImGui_ImplOpenGL3_CreateFontsTexture();
 	ImGui_ImplOpenGL3_CreateDeviceObjects();
 	
-	auto context = Context::Create();
+	auto context = Context::Create(shaderNum);
 	if (!context)
 	{
 		SPDLOG_ERROR("failed to create context");
@@ -110,14 +115,15 @@ int main()
 	glfwSetMouseButtonCallback(window, OnMouseButton);
 	SPDLOG_INFO("Start main loop");
 
-	while (!glfwWindowShouldClose(window))
+	int render_result = 0;
+	while (!glfwWindowShouldClose(window) && !render_result)
 	{
 		glfwPollEvents();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 	
 		context->ProcessInput(window);
-		context->Render();
+		render_result = context->Render(shaderNum);
 	
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
