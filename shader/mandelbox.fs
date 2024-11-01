@@ -23,24 +23,24 @@ void sphereFold(inout vec3 z, inout float dz)
 	}
 }
 
-void boxFold(inout vec3 z, inout float dz)
+void boxFold(inout vec3 pos, inout float dz)
 {
-	z = clamp(z, -1.0, 1.0) * 2.0 - z;
+	pos = clamp(pos, -1.0, 1.0) * 2.0 - pos;
 }
 
-float mandelbox(vec3 z)
+float mandelbox(vec3 pos)
 {
     float scale = 3.0 + sin(iTime);
-	vec3 offset = z;
+	vec3 offset = pos;
 	float dr = 1.0;
 	for (int n = 0; n < 10; n++)
     {
-		boxFold(z,dr);
-		sphereFold(z,dr);
-        z = scale * z + offset;
+		boxFold(pos, dr);
+		sphereFold(pos, dr);
+        pos = scale * pos + offset;
         dr = dr * abs(scale) + 1.0;
 	}
-	float r = length(z);
+	float r = length(pos);
 	return r / abs(dr);
 }
 
@@ -80,16 +80,16 @@ vec3 normal( in vec3 pos )
 float ambientOcclusion( in vec3 pos, in vec3 normal )
 {
 	float occ = 0.0;
-    float sca = 1.0;
+    float scaleFactor = 1.0;
     for( int i=0; i<5; i++)
     {
-        float hr = 0.01 + 0.12 * float(i) / 4.0;
-        vec3 aopos =  normal * hr + pos;
-        float dd = mandelbox( aopos );
-        occ += -(dd-hr)*sca;
-        sca *= 0.95;
+        float offsetDist = 0.01 + 0.12 * float(i) / 4.0;
+        vec3 aopos =  normal * offsetDist + pos;
+        float distToSurface = mandelbox( aopos );
+        occ += -(distToSurface - offsetDist) * scaleFactor;
+        scaleFactor *= 0.95;
     }
-    return clamp( 1.0 - 3.0*occ, 0.0, 1.0 );    
+    return clamp( 1.0 - 3.0 * occ, 0.0, 1.0 );    
 }
 
 vec3 lightingModel( in vec3 lightdir, in vec3 lightcol, in vec3 albedo, in vec3 norm, in vec3 camdir )

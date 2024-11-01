@@ -92,7 +92,6 @@ bool Context::Init(std::string &shaderNum)
 	};
 	unsigned int indices[] = { 0, 1, 2, 2, 3, 0 };
 
-	
 	glClearColor(0.0f, 0.1f, 0.2f, 0.0f);
 	if (shaderNum == "1")
 		mandelBulb_setting(vertices, indices);
