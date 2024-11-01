@@ -39,7 +39,7 @@ void Context::ProcessInput(GLFWwindow* window)
 void Context::Reshape(int width, int height) 
 {
 	m_width = width;
-	m_height = height;
+	m_height = height;	
 	glViewport(0, 0, m_width, m_height);
 }
 
@@ -101,6 +101,7 @@ bool Context::Init(std::string &shaderNum)
 	
 	return true;
 }
+
 int Context::Render(std::string &shaderNum)
 {
 	if (shaderNum == "1")
@@ -231,19 +232,6 @@ void Context::mandelBox_setting(float * vertices, unsigned int * indices)
 
 	m_program = Program::Create("/Users/sihwan/Programming/shaderPixel/shader/basic.vs", "/Users/sihwan/Programming/shaderPixel/shader/mandelbox.fs");
 
-	auto model = glm::mat4(1.0f);
-	m_cameraFront =
-		glm::rotate(glm::mat4(1.0f),
-			glm::radians(m_cameraYaw), glm::vec3(0.0f, 1.0f, 0.0f)) *
-		glm::rotate(glm::mat4(1.0f),
-			glm::radians(m_cameraPitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
-		glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
-
-	auto view = glm::lookAt(m_cameraPos, m_cameraPos + m_cameraFront, m_cameraUp);
-	m_cameraOrientation = glm::mat3(view);
-	auto projection = glm::perspective<float>(glm::radians(45.0f), static_cast<float>(WINDOW_WIDTH) / WINDOW_HEIGHT, 1.0f, 200.0f);
-	auto mvp = projection * view * model;
-	
 	m_program->Use();	
 
 	m_program->SetUniform("lightPos", m_lightPos);
@@ -252,13 +240,13 @@ void Context::mandelBox_setting(float * vertices, unsigned int * indices)
 
 void Context::mandelBox_render()
 {
-
 	static float time = 0.0f;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 	m_program->SetUniform("lightPos", m_lightPos);
 	m_program->SetUniform("iTime", time);
+	m_program->SetUniform("iResolution", glm::vec2(m_width, m_height));
 	
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

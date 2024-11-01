@@ -7,8 +7,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 # glfw로 띄울 윈도우의 정보 세팅
 set(WINDOW_NAME "openGL Example")
-set(WINDOW_WIDTH 320)
-set(WINDOW_HEIGHT 240)
+set(WINDOW_WIDTH 2560)
+set(WINDOW_HEIGHT 1920)
 
 # project define. project() can set the project name, language version.
 project(${PROJECT_NAME})

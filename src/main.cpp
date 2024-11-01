@@ -66,10 +66,11 @@ int main(int argc, char* argv[])
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); 
-	glfwWindowHint(GLFW_SAMPLES, 4); // sample 5개를 쓰는 멀티샘플
+	// glfwWindowHint(GLFW_SAMPLES, 4); // sample 5개를 쓰는 멀티샘플
+	// glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GL_FALSE);
 
-	SPDLOG_INFO("Create glfw window");
-	auto window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, nullptr, nullptr); 
+	SPDLOG_INFO("Create glfw window");	
+	auto window = glfwCreateWindow(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, WINDOW_NAME, nullptr, nullptr); 
 	if (!window)
 	{
 		SPDLOG_ERROR("failed to create glfw window");

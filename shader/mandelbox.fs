@@ -77,28 +77,14 @@ vec3 normal( in vec3 pos )
 					  v4*mandelbox( pos + v4*eps ) );
 }
 
-float softray( in vec3 ro, in vec3 rd , in float hn)
-{
-    float res = 1.0;
-    float t = 0.0005;
-	float h = 1.0;
-    for( int i=0; i<40; i++ )
-    {
-        h = mandelbox(ro + rd*t);
-        res = min( res, hn*h/t );
-		t += clamp( h, 0.02, 2.0 );
-    }
-    return clamp(res,0.0,1.0);
-}
-
-float ambientOcclusion( in vec3 pos, in vec3 nor )
+float ambientOcclusion( in vec3 pos, in vec3 normal )
 {
 	float occ = 0.0;
     float sca = 1.0;
-    for( int i=0; i<5; i++ )
+    for( int i=0; i<5; i++)
     {
-        float hr = 0.01 + 0.12*float(i)/4.0;
-        vec3 aopos =  nor * hr + pos;
+        float hr = 0.01 + 0.12 * float(i) / 4.0;
+        vec3 aopos =  normal * hr + pos;
         float dd = mandelbox( aopos );
         occ += -(dd-hr)*sca;
         sca *= 0.95;
@@ -116,7 +102,7 @@ vec3 lightingModel( in vec3 lightdir, in vec3 lightcol, in vec3 albedo, in vec3 
 
 vec3 material( in vec3 contactPoint , in vec3 camdir )
 {    
-	vec3 norm = normal(contactPoint);
+	vec3 norm = -normal(contactPoint);
     
     vec3 lightDir = -normalize(vec3(5.0,10.0,-20.0));
 	vec3 lightCol = vec3(1.0, 0.9, 0.8);
@@ -164,8 +150,8 @@ void main()
 	vec3 campos = vec3(20.0 * cos(time / 5.0), 10.0, 10.0 * sin(time / 5.0));	
 	vec3 camtar = vec3(0.0, 0.0, 0.0);
 
-	mat3 camMat = calcViewMatrix(campos, camtar, 0.0);
-	vec3 camdir = normalize( camMat * vec3(pos, 0.9) );
+	mat3 viewMat = calcViewMatrix(campos, camtar, 0.0);
+	vec3 camdir = normalize( viewMat * vec3(pos, 0.9) );
 
 	vec3 color = rayrender(campos, camdir);
 	FragColor = vec4(color, 1.0);

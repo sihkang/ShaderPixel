@@ -35,8 +35,8 @@ private:
 	ProgramUPtr m_program;
 
  	// screen size
-	int m_width {640};
-	int m_height {480};
+	int m_width {WINDOW_WIDTH};
+	int m_height {WINDOW_HEIGHT};
 
 	// Buffer
 	VertexLayoutUPtr vao;
