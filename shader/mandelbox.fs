@@ -96,7 +96,7 @@ float ambientOcclusion( in vec3 pos, in vec3 normal )
 
 vec3 lightingModel( in vec3 lightdir, in vec3 lightcol, in vec3 albedo, in vec3 norm, in vec3 camdir )
 {    
-    float diffuse = pow(0.5 + 0.5*dot(norm, -lightdir),2.0);;
+    float diffuse = pow(0.5 + 0.5*dot(norm, -lightdir),2.0);
     float specular = pow(max(dot(-camdir, reflect(lightdir, norm)), -0.0), 8.0);
     
     return lightcol * (albedo * diffuse + specular);
@@ -151,10 +151,10 @@ void main()
 
 	// vec3 campos = vec3(20.0 * cos(time / 5.0), 10.0, 10.0 * sin(time / 5.0));	
 	vec3 camtar = vec3(0.0, 0.0, 0.0);
-
+    vec3 camdir = normalize( camtar - campos );
 	mat3 viewMat = calcViewMatrix(campos, camtar, 0.0);
-	vec3 camdir = normalize( viewMat * vec3(pos, 0.9) );
+	vec3 raydir = normalize( viewMat * vec3(pos, 1.0) );
 
-	vec3 color = rayrender(campos, camdir);
+	vec3 color = rayrender(campos, raydir);
 	FragColor = vec4(color, 1.0);
 }
