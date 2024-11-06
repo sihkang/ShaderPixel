@@ -5,6 +5,7 @@ out vec4 FragColor;
 uniform vec3 lightPos;
 uniform vec2 iResolution;  // 화면 해상도
 uniform float iTime;       // 시간
+uniform vec3 campos;
 
 void sphereFold(inout vec3 z, inout float dz)
 {
@@ -31,7 +32,7 @@ void boxFold(inout vec3 pos, inout float dz)
 float mandelbox(vec3 pos)
 {
     float t = iTime * 0.1;
-    float scale = -5.0 + t;
+    float scale = sin(t) + 2.0;
 	vec3 offset = pos;
 	float dr = 1.0;
 	for (int n = 0; n < 10; n++)
@@ -148,7 +149,7 @@ void main()
 	vec2 pos = 2.0 * gl_FragCoord.xy / iResolution - 1;
 	pos.x *= iResolution.x / iResolution.y;
 
-	vec3 campos = vec3(20.0 * cos(time / 5.0), 10.0, 10.0 * sin(time / 5.0));	
+	// vec3 campos = vec3(20.0 * cos(time / 5.0), 10.0, 10.0 * sin(time / 5.0));	
 	vec3 camtar = vec3(0.0, 0.0, 0.0);
 
 	mat3 viewMat = calcViewMatrix(campos, camtar, 0.0);

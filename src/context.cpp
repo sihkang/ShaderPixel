@@ -216,7 +216,7 @@ void Context::mandelBox_setting(float * vertices, unsigned int * indices)
 	m_prevMousePos = glm::vec2(0.0f);
 	m_cameraPitch = 0.0f;
 	m_cameraYaw = 0.0f;
-	m_cameraPos = glm::vec3(0.0f, 0.0f,  1.0f);
+	m_cameraPos = glm::vec3(20.0f, 10.0f, 0.0f);
 	m_cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 	m_cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -234,17 +234,31 @@ void Context::mandelBox_setting(float * vertices, unsigned int * indices)
 	m_program->Use();	
 
 	m_program->SetUniform("lightPos", m_lightPos);
+	m_program->SetUniform("campos", m_cameraPos);
+	m_program->SetUniform("camtar", m_cameraFront);
 	m_program->SetUniform("iResolution", glm::vec2(m_width, m_height));
 }
 
 void Context::mandelBox_render()
 {
 	static float time = 0.0f;
-
+	
+	if (ImGui::Begin("Camera Setting")) {
+		// 카메라 Position 입력
+		ImGui::InputFloat3("Camera Position", &m_cameraPos[0], "%.2f"); // 포맷을 통해 소수점 이하 두 자리까지 표현
+		// // 카메라 Front 벡터 입력
+		// ImGui::InputFloat3("Camera Front", &m_cameraFront[0], "%.2f");
+		// // 카메라 Up 벡터 입력
+		// ImGui::InputFloat3("Camera Up", &m_cameraUp[0], "%.2f");
+	}
+	
+	ImGui::End();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 	m_program->SetUniform("lightPos", m_lightPos);
 	m_program->SetUniform("iTime", time);
+	m_program->SetUniform("campos", m_cameraPos);
+	m_program->SetUniform("camtar", m_cameraFront);
 	m_program->SetUniform("iResolution", glm::vec2(m_width, m_height));
 	
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
