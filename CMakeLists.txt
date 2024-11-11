@@ -4,8 +4,8 @@ set(PROJECT_NAME transformation_example)
 set(CMAKE_CXX_STANDARD 17)
 
 set(WINDOW_NAME "Transformation Example")
-set(WINDOW_WIDTH 640)
-set(WINDOW_HEIGHT 480)
+set(WINDOW_WIDTH 1280)
+set(WINDOW_HEIGHT 960)
 
 project(${PROJECT_NAME})
 
@@ -18,6 +18,8 @@ add_executable(${PROJECT_NAME}
 	src/context.cpp src/context.h
 	src/buffer.cpp src/buffer.h
 	src/vertexLayout.cpp src/vertexLayout.h
+	src/image.cpp src/image.h
+	src/texture.cpp src/texture.h
 	)
 
 include(Dependency.cmake)
