@@ -134,8 +134,8 @@ void Context::mandelBulb_setting(float *vertices, unsigned int *indices)
 	
 	vao->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 	ebo = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32_t) * 6);
-
-	m_program = Program::Create("/Users/sihwan/Programming/shaderPixel/shader/basic.vs", "/Users/sihwan/Programming/shaderPixel/shader/mandelbulb.fs");
+//C:\\Users\\kangs\\source\\repos\\sihkang\\ShaderPixel\\shader
+	m_program = Program::Create("C:\\Users\\kangs\\source\\repos\\sihkang\\ShaderPixel\\shader\\basic.vs", "C:\\Users\\kangs\\source\\repos\\sihkang\\ShaderPixel\\shader\\mandelbulb.fs");
 
 	auto model = glm::mat4(1.0f);
 	m_cameraFront =
@@ -229,7 +229,7 @@ void Context::mandelBox_setting(float * vertices, unsigned int * indices)
 	vao->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 	ebo = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32_t) * 6);
 
-	m_program = Program::Create("/Users/sihwan/Programming/shaderPixel/shader/basic.vs", "/Users/sihwan/Programming/shaderPixel/shader/mandelbox.fs");
+	m_program = Program::Create("C:\\Users\\kangs\\source\\repos\\sihkang\\ShaderPixel\\shader\\basic.vs", "C:\\Users\\kangs\\source\\repos\\sihkang\\ShaderPixel\\shader\\mandelbox.fs");
 
 	m_program->Use();	
 

@@ -30,8 +30,8 @@ void boxFold(inout vec3 pos, inout float dz)
 
 float mandelbox(vec3 pos)
 {
-    float t = iTime * 0.1;
-    float scale = -5.0 + t;
+    float t = iTime;
+    float scale = 3.0 * sin(t * 0.1);
 	vec3 offset = pos;
 	float dr = 1.0;
 	for (int n = 0; n < 10; n++)
