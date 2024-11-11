@@ -50,13 +50,13 @@ float raymarcher( in vec3 rayOrigin, in vec3 rayDir )
 {
 	const float maxd = 50.0;
 	const float eps = 0.01;
-    float h = eps * 2.0;
     float dist = 0.0;
+    float h;
 	
     for( int i = 0; i < 100; i++ )
     {
-        if( h < eps || dist > maxd ) break;
 	    h = mandelbox( rayOrigin + rayDir * dist );
+        if( h < eps || dist > maxd ) break;
         dist += h * 1.0;
     }
 

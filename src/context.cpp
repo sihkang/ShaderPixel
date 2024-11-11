@@ -229,7 +229,7 @@ void Context::mandelBox_setting(float * vertices, unsigned int * indices)
 	vao->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 	ebo = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32_t) * 6);
 
-	m_program = Program::Create("/Users/sihwan/Programming/shaderPixel/shader/basic.vs", "/Users/sihwan/Programming/shaderPixel/shader/transluscent.fs");
+	m_program = Program::Create("/Users/sihwan/Programming/shaderPixel/shader/basic.vs", "/Users/sihwan/Programming/shaderPixel/shader/mandelbox.fs");
 
 	m_program->Use();	
 

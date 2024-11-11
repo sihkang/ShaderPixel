@@ -1,121 +1,71 @@
 #version 410 core
 
-out vec4 fragColor;
+out vec4 FragColor;
 
-uniform vec2 iResolution;
-uniform float iTime;
-uniform vec3 campos;
+uniform vec2 iResolution;  // 화면 해상도
+uniform float iTime;       // 시간
 
-float sphereSDF(vec3 pos, vec3 center, float radius) {
-    return length(pos - center) - radius;
+mat2 rot(float a) { return mat2(cos(a), sin(a), -sin(a), cos(a)); }
+
+float noise(vec3 x) {
+    vec3 p = floor(x);
+    vec3 f = fract(x);
+    
+	f = f * f * (3.0 - 2.0 * f);
+	vec2 uv = (p.xy + vec2(37.0, 17.0) * p.z) + f.xy;
+	vec2 rg = vec2(sin(iTime));
+    // vec2 rg = textureLod( iChannel0, (uv+ 0.5) / 256.0, 0. ).yx;
+	return -1.0+2.0*mix( rg.x, rg.y, f.z );
 }
 
-vec3 spheres[3] = vec3[](vec3(0.0, 0.0, 0.0), vec3(2.0, 1.0, -3.0), vec3(-1.5, -0.5, 2.0));
-vec3 colors[3] = vec3[](vec3(0.7, 0.2, 0.2), vec3(0.2,0.7,0.2), vec3(0.2,0.2,0.7));
-float radii[3] = float[](1.0, 0.5, 0.8);
-
-int idx;
-
-float minSphereSDF(vec3 pos) {
-    float minDist = 1e10; // 초기값을 큰 값으로 설정
-    for (int i = 0; i < 3; i++) {
-        float d = sphereSDF(pos, spheres[i], radii[i]);
-		if (minDist > d)
-		{
-			minDist = d;
-			idx = i;
-		}
+float smoke(vec3 pos) 
+{
+    vec3 q = 2.0 * pos;
+    float f = 0.0, amp = 0.5;
+    for(int i = 0; i < 5; ++i, amp *= 0.4, q *= 2.1) 
+    { // fbm
+        q += iTime * vec3(0.17, -0.5, 0);
+        f += amp * noise(q);
     }
-    return minDist;
+    float noiseShape = 0.5 + 0.8 * max(pos.y, 0.0) - 1.0 * length(pos.xz);
+    return clamp(1.0 +  noiseShape * f - length(pos), 0.0, 1.0);
 }
 
-float raymarcher(in vec3 rayOrigin, in vec3 rayDir) {
-    const float maxd = 50.0;
-    const float eps = 0.01;
-    float dist = 0.0;
 
-    for (int i = 0; i < 100; i++) {
-        vec3 currentPos = rayOrigin + rayDir * dist;
-        float h = minSphereSDF(currentPos); // 최소 SDF 사용
-        if (h < eps) break; // 오브젝트에 도달하면 종료
-        dist += h;
-        if (dist > maxd) return -1.0; // 최대 거리를 넘으면 없음
+vec3 shading(vec3 rayOrigin, vec3 rayDir) 
+{
+    vec3 lightDir = normalize(vec3(0.5, 1.0, -0.7));
+
+    const float nbStep = 30.0, diam = 5.0, rayLength = diam / nbStep;
+
+    float start = length(rayOrigin) - diam / 2.0, end = start + diam;
+    float sumDen = 0.0, sumDif = 0.0;
+    
+    for(float d = end; d > start; d -= rayLength) { // raymarching
+        vec3 pos = rayOrigin + d * rayDir;
+    	if(dot(pos, pos) > diam * diam) break;
+        float den = smoke(pos);
+        sumDen += den;
+        if(den > 0.02) 
+			sumDif += max(0.0, den - smoke(pos + lightDir * 0.17));
     }
-    return dist;
-}
 
-vec3 normal( in vec3 pos )
-{
-    const float eps = 0.005;
-
-    const vec3 v1 = vec3( 1.0,-1.0,-1.0);
-    const vec3 v2 = vec3(-1.0,-1.0, 1.0);
-    const vec3 v3 = vec3(-1.0, 1.0,-1.0);
-    const vec3 v4 = vec3( 1.0, 1.0, 1.0);
-
-	return -normalize( v1*sphereSDF( pos + v1*eps, spheres[idx], radii[idx] ) + 
-					  v2*sphereSDF( pos + v2*eps, spheres[idx], radii[idx] ) + 
-					  v3*sphereSDF( pos + v3*eps, spheres[idx], radii[idx] ) + 
-					  v4*sphereSDF( pos + v4*eps, spheres[idx], radii[idx] ) );
-}
-
-vec3 lightingModel( in vec3 lightdir, in vec3 lightcol, in vec3 albedo, in vec3 norm, in vec3 raydir)
-{
-	float diffuse = dot(norm, -lightdir);
-	float specular = pow(max(dot(-raydir, reflect(lightdir, norm)), -0.0), 128.0);
-
-	return lightcol * (albedo * diffuse + specular);
-}
-
-vec3 material(in vec3 contactPoint, in vec3 raydir)
-{
-	vec3 norm = - normal(contactPoint);
-
-	vec3 lightDir = -normalize(vec3(1.0, 1.0, 1.0));
-	vec3 lightCol = vec3(1.0, 1.0, 1.0);
-
-	vec3 albedo = colors[idx];
-
-	float amb = 0.2;
-	vec3 pointColor = lightingModel(lightDir, lightCol, albedo, norm, raydir);
-	
-	return amb + pointColor;
-}
-
-vec3 rayrender(vec3 campos, vec3 raydir)
-{
-	vec3 color = vec3(0.0);
-
-	float dist = raymarcher(campos, raydir);
-
-	if (dist != -1.0)
-	{
-		vec3 contactPoint = campos + dist * raydir;
-		color = material(contactPoint, raydir);
-	}
-	return color;
-}
-
-mat3 calcViewMatrix(in vec3 campos, in vec3 camtar)
-{
-	vec3 camDir = normalize(camtar - campos);
-	vec3 camUp = normalize( cross(camDir, vec3(0.0, 1.0, 0.0)));
-	vec3 camRight = normalize( cross(camUp, camDir));
-	return mat3(camRight, camUp, camDir);
+    const vec3 lightCol = vec3(0.95, 0.75, 0.3);
+    float light = 10.0 * pow(max(0.0, dot(rayDir, lightDir)), 10.0);
+    vec3 col = 0.01 * light * lightCol;
+    col += 0.4 * sumDen * rayLength * vec3(0.8, 0.9, 1.0); // ambient
+    col += 1.3 * sumDif * rayLength * lightCol;         // diffuse
+	return col;
 }
 
 void main()
 {
-	float time = iTime;
-
-	vec2 pos = 2.0 * gl_FragCoord.xy / iResolution - 1;
-	pos.x *= iResolution.x / iResolution.y;
-
-	vec3 camtar = vec3(0.0, 0.0, 0.0);
-
-	mat3 viewMat = calcViewMatrix(campos, camtar);
-	vec3 raydir = normalize( viewMat * vec3(pos, 1.0 ));
-
-	vec3 color = rayrender(campos, raydir);
-	fragColor = vec4(color, 1.0);
+	
+	vec2 uv = (gl_FragCoord.xy / iResolution.xy) * 2.0 - 1.0;
+	uv.x *= iResolution.x / iResolution.y;
+ 
+    vec3 rayDir = normalize(vec3(uv, 2.0));
+    vec3 camPos = vec3(0.0, 1.0, -5.5);
+    
+	FragColor = vec4(shading(camPos, rayDir), 1.0);
 }
