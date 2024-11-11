@@ -1,9 +1,0 @@
-/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/shaderPixel.dir
-/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/dep_spdlog.dir
-/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/dep_glad.dir
-/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/dep_glfw.dir
-/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/dep_stb.dir
-/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/dep_glm.dir
-/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/imgui.dir
-/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/edit_cache.dir
-/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/rebuild_cache.dir
