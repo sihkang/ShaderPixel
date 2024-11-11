@@ -1,0 +1,14 @@
+# Target labels
+ dep_spdlog
+# Source files and their labels
+/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/dep_spdlog
+/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/dep_spdlog.rule
+/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/dep_spdlog-complete.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_spdlog-prefix/src/dep_spdlog-stamp/dep_spdlog-build.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_spdlog-prefix/src/dep_spdlog-stamp/dep_spdlog-configure.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_spdlog-prefix/src/dep_spdlog-stamp/dep_spdlog-download.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_spdlog-prefix/src/dep_spdlog-stamp/dep_spdlog-install.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_spdlog-prefix/src/dep_spdlog-stamp/dep_spdlog-mkdir.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_spdlog-prefix/src/dep_spdlog-stamp/dep_spdlog-patch.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_spdlog-prefix/src/dep_spdlog-stamp/dep_spdlog-test.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_spdlog-prefix/src/dep_spdlog-stamp/dep_spdlog-update.rule

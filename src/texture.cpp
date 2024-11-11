@@ -38,8 +38,8 @@ void Texture::CreateTexture()
 {
 	glGenTextures(1, &m_texture);
 	Bind();
-	SetFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-	SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);	
+	SetFilter(GL_LINEAR, GL_LINEAR);
+	SetWrap(GL_REPEAT, GL_REPEAT);	
 }
 
 void Texture::SetTextureFromImage(const Image* image)

@@ -1,0 +1,14 @@
+# Target labels
+ dep_stb
+# Source files and their labels
+/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/dep_stb
+/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/dep_stb.rule
+/Users/sihwan/Programming/shaderPixel/build/CMakeFiles/dep_stb-complete.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_stb-prefix/src/dep_stb-stamp/dep_stb-build.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_stb-prefix/src/dep_stb-stamp/dep_stb-configure.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_stb-prefix/src/dep_stb-stamp/dep_stb-download.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_stb-prefix/src/dep_stb-stamp/dep_stb-install.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_stb-prefix/src/dep_stb-stamp/dep_stb-mkdir.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_stb-prefix/src/dep_stb-stamp/dep_stb-patch.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_stb-prefix/src/dep_stb-stamp/dep_stb-test.rule
+/Users/sihwan/Programming/shaderPixel/build/dep_stb-prefix/src/dep_stb-stamp/dep_stb-update.rule

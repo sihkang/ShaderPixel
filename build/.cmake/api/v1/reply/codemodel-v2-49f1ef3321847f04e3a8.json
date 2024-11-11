@@ -1,0 +1,114 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "shaderPixel",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "dep_glad::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-dep_glad-Debug-e0b79f0e465c419fe695.json",
+					"name" : "dep_glad",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "dep_glfw::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-dep_glfw-Debug-21a11edb022c245b2432.json",
+					"name" : "dep_glfw",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "dep_glm::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-dep_glm-Debug-cb175b526b16584de8d2.json",
+					"name" : "dep_glm",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "dep_spdlog::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-dep_spdlog-Debug-e56972e4e7e577c3c302.json",
+					"name" : "dep_spdlog",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "dep_stb::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-dep_stb-Debug-8537dcb238a4d3320c48.json",
+					"name" : "dep_stb",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "imgui::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-imgui-Debug-4fd04254366b5b54f4ef.json",
+					"name" : "imgui",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "shaderPixel::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-shaderPixel-Debug-432fc999035895f595d9.json",
+					"name" : "shaderPixel",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/sihwan/Programming/shaderPixel/build",
+		"source" : "/Users/sihwan/Programming/shaderPixel"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

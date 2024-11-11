@@ -6,6 +6,9 @@
 #include "shader.h"
 #include "buffer.h"
 #include "vertexLayout.h"
+#include "image.h"
+#include "texture.h"
+#include "PerlinNoise.hpp"
 
 CLASS_PTR(Context)
 class Context {
@@ -24,9 +27,11 @@ public:
 	void mandelBulb_setting(float *vertices, unsigned int *indices);
 	void mandelbulb_render();
 
-
 	void mandelBox_setting(float *, unsigned int *);
 	void mandelBox_render();
+
+	void transluscent_setting(float * vertices, unsigned int *indices);
+	void transluscent_render();
 
 private:
 	Context() {}

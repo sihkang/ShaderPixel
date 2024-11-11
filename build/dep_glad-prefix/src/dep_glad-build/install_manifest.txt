@@ -1,0 +1,7 @@
+/Users/sihwan/Programming/shaderPixel/build/install/lib/libglad.a
+/Users/sihwan/Programming/shaderPixel/build/install/include/KHR/khrplatform.h
+/Users/sihwan/Programming/shaderPixel/build/install/include/glad/glad.h
+/Users/sihwan/Programming/shaderPixel/build/install/lib/cmake/glad/gladConfig.cmake
+/Users/sihwan/Programming/shaderPixel/build/install/lib/cmake/glad/gladConfigVersion.cmake
+/Users/sihwan/Programming/shaderPixel/build/install/lib/cmake/glad/gladTargets.cmake
+/Users/sihwan/Programming/shaderPixel/build/install/lib/cmake/glad/gladTargets-noconfig.cmake

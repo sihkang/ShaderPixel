@@ -2,6 +2,8 @@
 #include <spdlog/spdlog.h>
 #include <imgui.h>
 
+
+
 ContextUPtr Context::Create(std::string &shaderNum)
 {
 	auto context = ContextUPtr(new Context());
@@ -97,6 +99,8 @@ bool Context::Init(std::string &shaderNum)
 		mandelBulb_setting(vertices, indices);
 	if (shaderNum == "2")
 		mandelBox_setting(vertices, indices);
+	if (shaderNum == "3")
+		transluscent_setting(vertices, indices);
 	
 	return true;
 }
@@ -107,6 +111,8 @@ int Context::Render(std::string &shaderNum)
 		mandelbulb_render();
 	else if (shaderNum == "2")
 		mandelBox_render();
+	else if (shaderNum == "3")
+		transluscent_render();
 	else
 	{
 		SPDLOG_INFO("error: unavailable Shader Number.");
@@ -264,4 +270,84 @@ void Context::mandelBox_render()
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	time += 0.016;
+}
+
+
+void Context::transluscent_setting(float * vertices, unsigned int * indices)
+{
+
+	// camera parameter
+	m_cameraControl = false;
+	m_prevMousePos = glm::vec2(0.0f);
+	m_cameraPitch = 0.0f;
+	m_cameraYaw = 0.0f;
+	m_cameraPos = glm::vec3(1.0f, 1.0f, 10.0f);
+	m_cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	m_cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	// light
+	m_lightPos = glm::vec3(0.0f, 5.0f, 10.0f);
+
+	vao = VertexLayout::Create();
+	vbo = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(float) * 3 * 4);
+	
+	vao->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+	ebo = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32_t) * 6);
+
+
+	m_program = Program::Create("/Users/sihwan/Programming/shaderPixel/shader/basic.vs", "/Users/sihwan/Programming/shaderPixel/shader/transluscent.fs");
+
+	m_program->Use();	
+
+	m_program->SetUniform("lightPos", m_lightPos);
+	m_program->SetUniform("campos", m_cameraPos);
+	m_program->SetUniform("camtar", m_cameraFront);
+	m_program->SetUniform("iResolution", glm::vec2(m_width, m_height));
+}
+
+void Context::transluscent_render()
+{
+	static float time = 1.0f;
+	
+	if (ImGui::Begin("Camera Setting")) {
+		// 카메라 Position 입력
+		ImGui::InputFloat3("Camera Position", &m_cameraPos[0], "%.2f"); // 포맷을 통해 소수점 이하 두 자리까지 표현
+		// // 카메라 Front 벡터 입력
+		// ImGui::InputFloat3("Camera Front", &m_cameraFront[0], "%.2f");
+		// // 카메라 Up 벡터 입력
+		// ImGui::InputFloat3("Camera Up", &m_cameraUp[0], "%.2f");
+	}
+	
+	ImGui::End();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	const siv::PerlinNoise::seed_type seed = 123456u + time;
+
+	const siv::PerlinNoise perlin{ seed };
+	
+	auto image = Image::Create(WINDOW_WIDTH, WINDOW_HEIGHT, 4);
+	for (int y = 0; y < image->GetHeight(); ++y)
+	{
+		for (int x = 0; x < image->GetWidth(); ++x)
+		{
+			const float noise = perlin.octave2D_01((x * 0.01), (y * 0.01), 4);	
+		}
+	}
+
+	auto tex = Texture::CreateFromImage(image.get());
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex->Get());
+	m_program->SetUniform("iChannel0", 0);
+
+// glUniform1i(glGetUniformLocation(shaderProgram, "uNoiseTexture"), 0);
+	m_program->SetUniform("lightPos", m_lightPos);
+	m_program->SetUniform("iTime", time);
+	m_program->SetUniform("campos", m_cameraPos);
+	m_program->SetUniform("camtar", m_cameraFront);
+	m_program->SetUniform("iResolution", glm::vec2(m_width, m_height));
+	
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	time += 1.0;
 }

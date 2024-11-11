@@ -1,0 +1,8 @@
+/Users/sihwan/Programming/shaderPixel/build/dep_glad-prefix/src/dep_glad-build/CMakeFiles/glad-generate-files.dir
+/Users/sihwan/Programming/shaderPixel/build/dep_glad-prefix/src/dep_glad-build/CMakeFiles/glad.dir
+/Users/sihwan/Programming/shaderPixel/build/dep_glad-prefix/src/dep_glad-build/CMakeFiles/edit_cache.dir
+/Users/sihwan/Programming/shaderPixel/build/dep_glad-prefix/src/dep_glad-build/CMakeFiles/rebuild_cache.dir
+/Users/sihwan/Programming/shaderPixel/build/dep_glad-prefix/src/dep_glad-build/CMakeFiles/list_install_components.dir
+/Users/sihwan/Programming/shaderPixel/build/dep_glad-prefix/src/dep_glad-build/CMakeFiles/install.dir
+/Users/sihwan/Programming/shaderPixel/build/dep_glad-prefix/src/dep_glad-build/CMakeFiles/install/local.dir
+/Users/sihwan/Programming/shaderPixel/build/dep_glad-prefix/src/dep_glad-build/CMakeFiles/install/strip.dir
