@@ -8,15 +8,17 @@ set(WINDOW_WIDTH 640)
 set(WINDOW_HEIGHT 480)
 
 project(${PROJECT_NAME})
-add_executable(${PROJECT_NAME}
-    src/main.cpp
-    src/common.cpp src/common.h
-    src/shader.cpp src/shader.h
-    src/program.cpp src/program.h
-    src/context.cpp src/context.h
-    src/buffer.cpp src/buffer.h
-    src/vertexLayout.cpp src/vertexLayout.h
-    )
+
+# add execuatble file by ${PROJECT_NAME} using src/main.cpp
+add_executable(${PROJECT_NAME} 
+	src/main.cpp
+	src/common.cpp src/common.h 
+	src/shader.cpp src/shader.h
+	src/program.cpp src/program.h
+	src/context.cpp src/context.h
+	src/buffer.cpp src/buffer.h
+	src/vertexLayout.cpp src/vertexLayout.h
+	)
 
 include(Dependency.cmake)
 

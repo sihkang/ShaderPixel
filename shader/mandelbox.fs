@@ -5,6 +5,7 @@ out vec4 FragColor;
 uniform vec3 lightPos;
 uniform vec2 iResolution;  // 화면 해상도
 uniform float iTime;       // 시간
+uniform vec3 campos;
 
 void sphereFold(inout vec3 z, inout float dz)
 {
@@ -30,8 +31,8 @@ void boxFold(inout vec3 pos, inout float dz)
 
 float mandelbox(vec3 pos)
 {
-    float t = iTime;
-    float scale = 3.0 * sin(t * 0.1);
+    float t = iTime * 0.1;
+    float scale = -5.0 + t;
 	vec3 offset = pos;
 	float dr = 1.0;
 	for (int n = 0; n < 10; n++)
@@ -49,13 +50,13 @@ float raymarcher( in vec3 rayOrigin, in vec3 rayDir )
 {
 	const float maxd = 50.0;
 	const float eps = 0.01;
-    float h = eps * 2.0;
     float dist = 0.0;
+    float h;
 	
     for( int i = 0; i < 100; i++ )
     {
-        if( h < eps || dist > maxd ) break;
 	    h = mandelbox( rayOrigin + rayDir * dist );
+        if( h < eps || dist > maxd ) break;
         dist += h * 1.0;
     }
 
@@ -95,7 +96,7 @@ float ambientOcclusion( in vec3 pos, in vec3 normal )
 
 vec3 lightingModel( in vec3 lightdir, in vec3 lightcol, in vec3 albedo, in vec3 norm, in vec3 camdir )
 {    
-    float diffuse = pow(0.5 + 0.5*dot(norm, -lightdir),2.0);;
+    float diffuse = pow(0.5 + 0.5*dot(norm, -lightdir),2.0);
     float specular = pow(max(dot(-camdir, reflect(lightdir, norm)), -0.0), 8.0);
     
     return lightcol * (albedo * diffuse + specular);
@@ -148,12 +149,12 @@ void main()
 	vec2 pos = 2.0 * gl_FragCoord.xy / iResolution - 1;
 	pos.x *= iResolution.x / iResolution.y;
 
-	vec3 campos = vec3(20.0 * cos(time / 5.0), 10.0, 10.0 * sin(time / 5.0));	
+	// vec3 campos = vec3(20.0 * cos(time / 5.0), 10.0, 10.0 * sin(time / 5.0));	
 	vec3 camtar = vec3(0.0, 0.0, 0.0);
-
+    vec3 camdir = normalize( camtar - campos );
 	mat3 viewMat = calcViewMatrix(campos, camtar, 0.0);
-	vec3 camdir = normalize( viewMat * vec3(pos, 0.9) );
+	vec3 raydir = normalize( viewMat * vec3(pos, 1.0) );
 
-	vec3 color = rayrender(campos, camdir);
+	vec3 color = rayrender(campos, raydir);
 	FragColor = vec4(color, 1.0);
 }
