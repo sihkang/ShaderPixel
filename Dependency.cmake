@@ -22,6 +22,8 @@ set(DEP_LIST ${DEP_LIST} dep-spdlog)
 if (MSVC)
     set(DEP_LIBS ${DEP_LIBS} spdlog$<$<CONFIG:Debug>:d>)
 endif()
+
+
 # glfw include
 ExternalProject_Add(
     dep_glfw

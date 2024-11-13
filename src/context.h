@@ -8,7 +8,6 @@
 #include "vertexLayout.h"
 #include "image.h"
 #include "texture.h"
-#include "PerlinNoise.hpp"
 
 CLASS_PTR(Context)
 class Context {
@@ -33,9 +32,17 @@ public:
 	void transluscent_setting(float * vertices, unsigned int *indices);
 	void transluscent_render();
 
+	float ifrequency = 0.5f;
+	int	ioctaves = 8;
+	float ilacunarity = 1.5f;
+	float igain = 0.0f;
+	float iweighted_strength = 3.0f;
+	float iping_pong_strength = 2.0f;
+	float idomain_warp_amp = 30.0f;
+
 private:
 	Context() {}
-	bool Init(std::string &shaderNum);
+		bool Init(std::string &shaderNum);
 	
 	ProgramUPtr m_program;
 

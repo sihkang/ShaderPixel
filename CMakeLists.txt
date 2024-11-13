@@ -4,8 +4,8 @@ set(PROJECT_NAME transformation_example)
 set(CMAKE_CXX_STANDARD 17)
 
 set(WINDOW_NAME "Transformation Example")
-set(WINDOW_WIDTH 1280)
-set(WINDOW_HEIGHT 960)
+set(WINDOW_WIDTH 640)
+set(WINDOW_HEIGHT 480)
 
 project(${PROJECT_NAME})
 

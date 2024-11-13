@@ -275,7 +275,6 @@ void Context::mandelBox_render()
 
 void Context::transluscent_setting(float * vertices, unsigned int * indices)
 {
-
 	// camera parameter
 	m_cameraControl = false;
 	m_prevMousePos = glm::vec2(0.0f);
@@ -294,9 +293,15 @@ void Context::transluscent_setting(float * vertices, unsigned int * indices)
 	vao->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 	ebo = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32_t) * 6);
 
-
 	m_program = Program::Create("C:\\Users\\kangs\\source\\repos\\sihkang\\ShaderPixel\\shader\\basic.vs", "C:\\Users\\kangs\\source\\repos\\sihkang\\ShaderPixel\\shader\\transluscent.fs");
 	m_program->Use();	
+	m_program->SetUniform("ifrequency", ifrequency);
+	m_program->SetUniform("ioctaves", ioctaves);
+	m_program->SetUniform("ilancunarity", ilacunarity);
+	m_program->SetUniform("igain", igain);
+	m_program->SetUniform("iweighted_strength", iweighted_strength);
+	m_program->SetUniform("iping_pong_strength", iping_pong_strength);
+	m_program->SetUniform("idomain_warp_amp", idomain_warp_amp);
 
 	m_program->SetUniform("lightPos", m_lightPos);
 	m_program->SetUniform("campos", m_cameraPos);
@@ -307,39 +312,31 @@ void Context::transluscent_setting(float * vertices, unsigned int * indices)
 void Context::transluscent_render()
 {
 	static float time = 1.0f;
-	
-	if (ImGui::Begin("Camera Setting")) {
-		// 카메라 Position 입력
-		ImGui::InputFloat3("Camera Position", &m_cameraPos[0], "%.2f"); // 포맷을 통해 소수점 이하 두 자리까지 표현
-		// // 카메라 Front 벡터 입력
-		// ImGui::InputFloat3("Camera Front", &m_cameraFront[0], "%.2f");
-		// // 카메라 Up 벡터 입력
-		// ImGui::InputFloat3("Camera Up", &m_cameraUp[0], "%.2f");
-	}
-	
-	ImGui::End();
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	const siv::PerlinNoise::seed_type seed = 123456u + time;
-
-	const siv::PerlinNoise perlin{ seed };
-	
-	auto image = Image::Create(WINDOW_WIDTH, WINDOW_HEIGHT, 4);
-	for (int y = 0; y < image->GetHeight(); ++y)
-	{
-		for (int x = 0; x < image->GetWidth(); ++x)
-		{
-			const float noise = perlin.octave2D_01((x * 0.01), (y * 0.01), 4);	
-		}
+	if (ImGui::Begin("Camera Setting")) {
+		ImGui::InputFloat3("Camera Position", &m_cameraPos[0], "%.2f"); 
+		ImGui::SliderFloat("ifrequency", &ifrequency, 0.0f, 20.0f);
+		
+		ImGui::SliderInt("ioctaves", &ioctaves, 0.0f, 10.0f);
+		ImGui::SliderFloat("ilancunarity", &ilacunarity, 0.0f, 20.0f);
+		ImGui::SliderFloat("igain", &igain, 0.0f, 20.0f);
+		ImGui::SliderFloat("iweighted_strength", &iweighted_strength, 0.0f, 20.0f);
+		ImGui::SliderFloat("iping_pong_strength", &iping_pong_strength, 0.0f, 20.0f);
+		ImGui::SliderFloat("idomain_warp_amp", &idomain_warp_amp, 0.0f, 20.0f);
 	}
 
-	auto tex = Texture::CreateFromImage(image.get());
+	ImGui::End();
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tex->Get());
-	m_program->SetUniform("iChannel0", 0);
+	m_program->SetUniform("ifrequency", ifrequency);
+	m_program->SetUniform("ioctaves", ioctaves);
+	m_program->SetUniform("ilancunarity", ilacunarity);
+	m_program->SetUniform("igain", igain);
+	m_program->SetUniform("iweighted_strength", iweighted_strength);
+	m_program->SetUniform("iping_pong_strength", iping_pong_strength);
+	m_program->SetUniform("idomain_warp_amp", idomain_warp_amp);
 
-// glUniform1i(glGetUniformLocation(shaderProgram, "uNoiseTexture"), 0);
 	m_program->SetUniform("lightPos", m_lightPos);
 	m_program->SetUniform("iTime", time);
 	m_program->SetUniform("campos", m_cameraPos);
