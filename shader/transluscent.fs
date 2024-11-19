@@ -2275,17 +2275,9 @@ void fnlDomainWarp3D(fnl_state state, inout FNLfloat x, inout FNLfloat y, inout 
     }
 }
 
-float noise(vec3 x) 
+float noise(vec3 pos) 
 {
-    vec3 p = floor(x);
-    vec3 f = fract(x);
-    
-	f = f * f * (3.0 - 2.0 * f);
-	vec2 uv = (p.xy + vec2(37.0, 17.0) * p.z) + f.xy;
-
     fnl_state state = fnlCreateState(1337);
-
-
     state.frequency = ifrequency;
 	state.octaves = ioctaves;
 	state.lacunarity = ilacunarity;
@@ -2294,9 +2286,9 @@ float noise(vec3 x)
     state.ping_pong_strength = iping_pong_strength;
     state.domain_warp_amp = idomain_warp_amp;
 
-    float noise = fnlGetNoise3D(state, uv.x, uv.y, f.z) / 2.f + 0.5f;
+    float noise = fnlGetNoise3D(state, pos.x, pos.y, pos.z) / 2.f + 0.5f;
     
-	return -1.0+2.0*mix( noise, noise, f.z );
+	return -1.0+2.0*mix( 1.0f*noise, 1.5f * noise, 0.8f*noise );
 }
 
 float smoke(vec3 pos) 
@@ -2308,7 +2300,7 @@ float smoke(vec3 pos)
         q += iTime * vec3(0.17, -0.5, 0);
         f += amp * noise(q);
     }
-    float noiseShape = 0.5 + 0.8 * max(pos.y, 0.0) - 1.0 * length(pos.xz);
+    float noiseShape = 0.5 + 1.2 * max(pos.y, 0.0) - 1.0 * length(pos.xz);
     return clamp(1.0 +  noiseShape * f - length(pos), 0.0, 1.0);
 }
 
