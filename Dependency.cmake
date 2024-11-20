@@ -6,6 +6,20 @@ set(DEP_INSTALL_DIR ${PROJECT_BINARY_DIR}/install)
 set(DEP_INCLUDE_DIR ${DEP_INSTALL_DIR}/include)
 set(DEP_LIB_DIR ${DEP_INSTALL_DIR}/lib)
 
+# macOS 환경에서는 필요한 프레임워크를 명시적으로 링크합니다.
+if (APPLE)
+    find_library(COCOA_FRAMEWORK Cocoa)
+    find_library(IOKIT_FRAMEWORK IOKit)
+    find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
+
+    target_link_libraries(${PROJECT_NAME} PUBLIC
+        ${COCOA_FRAMEWORK}
+        ${IOKIT_FRAMEWORK}
+        ${COREFOUNDATION_FRAMEWORK}
+		${OPENGL_FRAMEWORK}
+    )
+endif()
+
 # spdlog: fast logger library
 ExternalProject_Add(
     dep-spdlog

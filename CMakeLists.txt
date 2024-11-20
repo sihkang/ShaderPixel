@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 3.13)
-add_compile_options(/utf-8)
-set(PROJECT_NAME transformation_example)
+if (MSVC)
+	add_compile_options(/utf-8)
+endif()
+set(PROJECT_NAME ShaderPixel)
 set(CMAKE_CXX_STANDARD 17)
 
-set(WINDOW_NAME "Transformation Example")
-set(WINDOW_WIDTH 640)
-set(WINDOW_HEIGHT 480)
+set(WINDOW_NAME "ShaderPixel")
+set(WINDOW_WIDTH 320)
+set(WINDOW_HEIGHT 240)
 
 project(${PROJECT_NAME})
 
@@ -38,6 +40,6 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 # Dependency들이 먼저 build 될 수 있게 관계 설정
 add_dependencies(${PROJECT_NAME} ${DEP_LIST})
 
-if (MSVC)
-    target_compile_options(${PROJECT_NAME} PUBLIC /wd4819)
-endif()
+# if (MSVC)
+#     target_compile_options(${PROJECT_NAME} PUBLIC /wd4819)
+# endif()
